@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shapelets"
-version = "1.1"
+version = "1.2"
 description = "Shapelets provide reference access to various shapelet functions and some of their applications."
 requires-python = ">=3.10"
 dependencies = [
@@ -48,8 +48,8 @@ classifiers = [
 ## NON-METADATA ##
 
 [project.scripts]
-shapelets = "shapelets._entry_points:_run_shapelets"
-shapelets-test = "shapelets._entry_points:_run_tests"
+shapelets = "shapelets.core.entry_points:run_shapelets"
+shapelets-test = "shapelets.core.entry_points:run_tests"
 
 [project.urls]
 homepage = "https://uw-comphys.github.io/shapelets"
@@ -64,10 +64,8 @@ where = ["."]
 [tool.setuptools.package-data]
 # Using shapelets as the main directory, then list global patterns underneath it
 shapelets = [
-	"tests/images/*",
-	"self_assembly/_rdistance.cpp",
-	"self_assembly/_rdistance_nix.so",
-	"self_assembly/_rdistance_win.so",
+	'tests/images/*',
+	'self_assembly/_rdistance*',
 ]
 
 

@@ -24,14 +24,16 @@ __all__ = [
     'cartesian1D',
     'cartesian2D',
     'polar2D',
-    'orthonormalpolar2D',
+    'orthonormalpolar2D_n0',
+    'orthonormalpolar2D_n1',
     'exponential1D',
     'exponential2D'
 ]
 
-def cartesian1D(n: int, x1: Union[float,np.ndarray], beta: float = 1.) -> Union[float,np.ndarray]:
+
+def cartesian1D(n: int, x1: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
     r""" 
-    1D cartesian shapelet function defined as[1]_,
+    1D cartesian shapelet function as defined in ref. [1],
 
     $$ S_{n}(x; \beta) = \beta^{-\frac{1}{2}}  \phi_{n}(\frac{x}{\beta}) $$
 
@@ -55,7 +57,7 @@ def cartesian1D(n: int, x1: Union[float,np.ndarray], beta: float = 1.) -> Union[
 
     References
     ----------
-    .. [1] https://doi.org/10.1046/j.1365-8711.2003.05901.x
+    * [1] https://doi.org/10.1046/j.1365-8711.2003.05901.x
 
     """
     if n < 0:
@@ -72,9 +74,9 @@ def cartesian1D(n: int, x1: Union[float,np.ndarray], beta: float = 1.) -> Union[
 
     return Sc(x1)
 
-def cartesian2D(n1: int, n2: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float = 1.) -> Union[float,np.ndarray]:
+def cartesian2D(n1: int, n2: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
     r""" 
-    2D cartesian shapelet function defined as[1]_,
+    2D cartesian shapelet function as defined in ref. [1],
 
     $$ S_{n_1,n_2}(x_1, x_2; \beta) = \beta^{-1} \phi_{n_1}(\frac{x_1}{\beta}) \phi_{n_2}(\frac{x_2}{\beta}) $$
 
@@ -102,7 +104,7 @@ def cartesian2D(n1: int, n2: int, x1: Union[float,np.ndarray], x2: Union[float,n
 
     References
     ----------
-    .. [1] https://doi.org/10.1046/j.1365-8711.2003.05901.x
+    * [1] https://doi.org/10.1046/j.1365-8711.2003.05901.x
 
     """
     if n1 < 0 or n2 < 0:
@@ -122,9 +124,9 @@ def cartesian2D(n1: int, n2: int, x1: Union[float,np.ndarray], x2: Union[float,n
 
     return Sc(x1, x2)
 
-def polar2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float = 1.) -> Union[float,np.ndarray]:
+def polar2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
     r""" 
-    2D polar shapelet function defined as[1]_,
+    2D polar shapelet function as defined in ref. [1],
 
     $$ S_{n, m}(r, \theta; \beta) = \alpha_1 \alpha_2 r^{|m|} L_{(n-|m|)/2}^{|m|} \left(\frac{r^2}{\beta^2}\right) exp\left( -\frac{r^2}{2\beta^2} \right) exp(-im\theta) $$
 
@@ -132,7 +134,7 @@ def polar2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndar
     $$ \alpha_1 = \frac{(-1)^{(n-|m|)/2}}{\beta^{|m|+1}} $$
     $$ \alpha_2 = \left[ \frac{[(n-|m|)/2]!} {\pi[(n+|m|)/2]!} \right]^{\frac{1}{2}}  $$
 
-    where $\beta$ is the shapelet length scale, $L$ is the generalized (associated) laguerre polynomial[2]_, $n$ is the shapelet order, and $m$ is also the shapelet order.
+    where $\beta$ is the shapelet length scale, $L$ is the generalized (associated) laguerre polynomial [2], $n$ is the shapelet order, and $m$ is also the shapelet order.
 
     Parameters
     ----------
@@ -154,8 +156,8 @@ def polar2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndar
 
     References
     ----------
-    .. [1] https://doi.org/10.1111/j.1365-2966.2005.09453.x
-    .. [2] https://scipy.github.io/devdocs/reference/generated/scipy.special.genlaguerre.html
+    * [1] https://doi.org/10.1111/j.1365-2966.2005.09453.x
+    * [2] https://scipy.github.io/devdocs/reference/generated/scipy.special.genlaguerre.html
 
     """
     if n < 0:
@@ -185,15 +187,15 @@ def polar2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndar
 
     return Sc(x1, x2)
 
-def orthonormalpolar2D(m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float = 1.) -> Union[float,np.ndarray]:
+def orthonormalpolar2D_n0(m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
     r""" 
-    Orthonormal 2D polar shapelet function defined as[1]_,
+    Orthonormal 2D polar shapelet function as defined in ref. [1],
 
     $$ S_{m}(r, \theta; \beta) = \frac{1}{\beta \sqrt{\pi m!}} \left( \frac{r}{\beta} \right)^m exp \left( -\frac{r^2}{2\beta^2}-im\theta \right) $$
 
-    with $$ \beta = \frac{fl}{\sqrt{m}} $$
+    with $$ \beta = \frac{fl}{\sqrt{m}} $$, and
 
-    where $\beta$ is the shapelet length scale, $f$ is a geometric scale factor[1]_, $l$ is the characteristic wavelength of the image[2]_, and $m$ is the shapelet degree of rotational symmetry.
+    where $\beta$ is the shapelet length scale, $f$ is a geometric scale factor [1], $l$ is the characteristic wavelength of the image [2], and $m$ is the shapelet degree of rotational symmetry.
 
     Parameters
     ----------
@@ -213,12 +215,12 @@ def orthonormalpolar2D(m: int, x1: Union[float,np.ndarray], x2: Union[float,np.n
 
     Notes
     -----
-    The orthonormal shapelet framework[1]_ only supports $n = 0$. See ref.[2]_ for computing the characteristic wavelength of an image. Note that this shapelet formulation is a re-parameterization of that found in shapelets.functions.polar2D.
+    This orthonormal shapelet framework was developed for $n = 0$ polar shapelets [1]. See ref. [2] for computing the characteristic wavelength of an image. Note that this shapelet formulation is a re-parameterization of the shapelets.functions.polar2D function.
 
     References
     ----------
-    .. [1] https://doi.org/10.1088/1361-6528/aaf353
-    .. [2] http://dx.doi.org/10.1103/PhysRevE.91.033307
+    * [1] https://doi.org/10.1088/1361-6528/aaf353
+    * [2] http://dx.doi.org/10.1103/PhysRevE.91.033307
 
     """
     if m < 1:
@@ -238,15 +240,64 @@ def orthonormalpolar2D(m: int, x1: Union[float,np.ndarray], x2: Union[float,np.n
 
     return Sc(x1, x2)
 
-def exponential1D(n: int, x1: Union[float,np.ndarray], beta: float = 1.) -> Union[float,np.ndarray]:
+def orthonormalpolar2D_n1(m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
     r""" 
-    1D exponential shapelet function defined as[1]_,
+    Orthonormal 2D polar shapelet function one degree of radial symmetry as defined in ref. [1],
+
+    $$ S_{m}(r, \theta; \beta) = \frac{r^m \beta^{-(m+1)}}{\sqrt{\pi m! (m+1)}}
+                                \left[ 1 + m- \left( \frac{r}{\beta}\right)^2 \right] 
+                                e^{-\frac{r^2}{2\beta^2}} e^{-im\theta} $$
+
+    where $\beta$ is the shapelet length scale, $l$ is the characteristic wavelength of the image [2], and $m$ is the shapelet degree of rotational symmetry.
+
+    Parameters
+    ----------
+    * m: int
+        * Shapelet degree of rotational symmetry. Acceptable values are $m > 1$
+    * x1: Union[float,np.ndarray]
+        * First input to shapelet function
+    * x2: Union[float,np.ndarray]
+        * Second input to shapelet function
+    * beta: float
+        * The shapelet length scale parameter
+
+    Returns
+    -------
+    * Sc(x1, x2): Union[float,np.ndarray]
+        * Shapelet function evaluated at (x1, x2)
+
+    Notes
+    -----
+    This orthonormal shapelet framework was developed for $n = 1$ polar shapelets [1]. See ref. [2] for computing the characteristic wavelength of an image. Note that this shapelet formulation is a re-parameterization of the shapelets.functions.polar2D function.
+
+    References
+    ----------
+    * [1] https://hdl.handle.net/10012/20779
+    * [2] http://dx.doi.org/10.1103/PhysRevE.91.033307
+
+    """
+    if m < 1:
+        raise ValueError("Function only supports m >= 1.")
+
+    # weighting constant
+    c = 1 / ( np.sqrt(np.pi * factorial(m, exact=True) * (m+1)) )
+
+    # shapelet function
+    X = lambda r: r**m * (1+m-(r**2)) * np.exp(-0.5 * r**2)
+    Sp = lambda r,t: (c / beta) * X(r/beta) * np.exp(-1j*m*t)
+    Sc = lambda x,y: Sp(np.sqrt(x**2 + y**2), np.arctan2(y,x))
+
+    return Sc(x1, x2)
+
+def exponential1D(n: int, x1: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
+    r""" 
+    1D exponential shapelet function as defined in ref. [1],
 
     $$ S_n(x; \beta) = \alpha \frac{2x}{n\beta} L^{1}_{n-1} \left( \frac{2x}{n\beta} \right) exp\left( -\frac{x}{n\beta} \right) \forall x \geq 0 $$
 
     with $$ \alpha = \frac{(-1)^{n-1}}{\sqrt{n^3\beta}} $$
 
-    where $\beta$ is the shapelet length scale, $L$ is the generalized (associated) laguerre polynomial[2]_, and $n$ is the shapelet order.
+    where $\beta$ is the shapelet length scale, $L$ is the generalized (associated) laguerre polynomial [2], and $n$ is the shapelet order.
 
     Parameters
     ----------
@@ -264,8 +315,8 @@ def exponential1D(n: int, x1: Union[float,np.ndarray], beta: float = 1.) -> Unio
         
     References
     ----------
-    .. [1] https://doi.org/10.1093/mnras/stz787
-    .. [2] https://scipy.github.io/devdocs/reference/generated/scipy.special.genlaguerre.html
+    * [1] https://doi.org/10.1093/mnras/stz787
+    * [2] https://scipy.github.io/devdocs/reference/generated/scipy.special.genlaguerre.html
 
     """
     if n < 1:
@@ -285,15 +336,15 @@ def exponential1D(n: int, x1: Union[float,np.ndarray], beta: float = 1.) -> Unio
 
     return Sc(x1)
 
-def exponential2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float = 1.) -> Union[float,np.ndarray]:
+def exponential2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,np.ndarray], beta: float) -> Union[float,np.ndarray]:
     r"""
-    2D exponential shapelet function defined as[1]_,
+    2D exponential shapelet function as defined in ref. [1],
 
     $$ S_{n,m}(r, \theta; \beta) = \alpha (2r)^{|m|} L^{2|m|}_{n-|m|}\left( \frac{2r}{\beta(2n+1)} \right) exp\left( -\frac{r}{\beta(2n+1)} \right) exp(-im\theta) $$
 
     with $$ \alpha = \frac{(-1)^n}{(\beta(2n+1))^{|m|}} \sqrt{ \frac{2}{\beta\pi(2n+1)^3} \frac{(n-|m|)!}{(n+|m|)!} } $$
 
-    where $\beta$ is the shapelet length scale, $L$ is the generalized (associated) laguerre polynomial[2]_, $n$ is the shapelet order, and $m$ is also the shapelet order.
+    where $\beta$ is the shapelet length scale, $L$ is the generalized (associated) laguerre polynomial [2], $n$ is the shapelet order, and $m$ is also the shapelet order.
 
     Parameters
     ----------
@@ -315,8 +366,8 @@ def exponential2D(n: int, m: int, x1: Union[float,np.ndarray], x2: Union[float,n
 
     References
     ----------
-    .. [1] https://doi.org/10.1093/mnras/stz787
-    .. [2] https://scipy.github.io/devdocs/reference/generated/scipy.special.genlaguerre.html
+    * [1] https://doi.org/10.1093/mnras/stz787
+    * [2] https://scipy.github.io/devdocs/reference/generated/scipy.special.genlaguerre.html
 
     """
     if n < 0:

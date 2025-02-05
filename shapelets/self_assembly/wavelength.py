@@ -15,72 +15,39 @@
 # <https://www.gnu.org/licenses/>.                                                                                     #
 ########################################################################################################################
 
+r"""
+This module holds functions responsible for computing the characteristic wavelength of an image.
+"""
+
 import numbers 
 
 import numpy as np
 
 __all__ = [
-    'lambda_to_beta',
     'get_wavelength',
+    'radialavg',
 ]
 
-def lambda_to_beta(m: int, l: float):
+
+def get_wavelength(image: np.ndarray, rng: list = [0, 100], verbose: bool = True) -> float:
     r""" 
-    Converts lambda (l), the characteristic wavelength of the image[1]_ to the appropriate beta value for orthonormal polar shapelets[2]_ (see shapelets.functions.orthonormalpolar2D).
-    
-    Parameters
-    ----------
-    * m: int
-        * Shapelet degree of rotational symmetry
-    * l: float
-        * The characteristic wavelength of the image[1]_
-    
-    Returns
-    -------
-    * beta: float
-        * The characteristic shapelet length scale parameter based on ref.[2]_
-
-    References
-    ----------
-    .. [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
-    .. [2] https://doi.org/10.1088/1361-6528/aaf353
-
-    """
-    if m == 4:   
-        f = np.sqrt(2) / 2
-    elif m == 3: 
-        f = 1 / np.sqrt(3)
-    elif m == 2: 
-        f = 1 / 2
-    elif m == 1: 
-        f = 1 / 4
-    else:        
-        f = 1
-
-    beta = (l / np.sqrt(m)) * f
-    return beta
-
-def get_wavelength(image: np.ndarray, rng: list = [0, 50], verbose: bool = True):
-    r""" 
-    Find characteristic wavelength of an image. Computed from ref.[1]_.
-
-    mpt@mpt: The rng needs to be optimized better. For example, if the wavelength is bigger than 50 need to fix this. But, if we just let rng = None (i.e., all wavelengths) then it will find way too big of a wavelength as the scale...
+    Find characteristic wavelength of an image. Computed using method described in ref. [1].
     
     Parameters
     ----------
     * image: np.ndarray
         * The image to be processed
     * rng: list
-        * Range of wavelengths to consider for maximum wavelength. I.e., will return max wavelength in range of [0, 50] (default)
+        * Range of wavelengths to consider for maximum wavelength. I.e., will return max wavelength in range of [0, 70] (default)
 
     Returns
     -------
     * char_wavelength: float
-        * The characteristic wavelength of the image
+        * The characteristic wavelength of the image [1]
 
     References
     ----------
-    .. [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
+    * [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
     
     """
     if type(image) != np.ndarray:
@@ -120,9 +87,9 @@ def get_wavelength(image: np.ndarray, rng: list = [0, 50], verbose: bool = True)
     
     return rai_wave[i_max]
 
-def radialavg(image: np.ndarray):
+def radialavg(image: np.ndarray) -> np.ndarray:
     r""" 
-    Calculates the radially averaged intensity of an image. Based on work from ref.[1]_.
+    Calculates the radially averaged intensity of an image. Based on work from ref. [1].
     
     Parameters
     ----------
@@ -136,7 +103,7 @@ def radialavg(image: np.ndarray):
 
     References
     ----------
-    .. [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
+    * [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
     
     """
     # Determine two arrays, x and y, which contain the indices of the image.

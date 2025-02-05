@@ -15,10 +15,6 @@
 # <https://www.gnu.org/licenses/>.                                                                                     #
 ########################################################################################################################
 
-# Website front page goes here
-
 r"""
-
-.. include:: ../WEBHOME.md
-
+The core submodule which holds all shapelet function definitions, as well as entry points and run functions for usage of the shapelets library via configuration files.
 """

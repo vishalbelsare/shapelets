@@ -15,10 +15,43 @@
 # <https://www.gnu.org/licenses/>.                                                                                     #
 ########################################################################################################################
 
-# Website front page goes here
+import configparser
+import os
 
-r"""
+from .analysis import do_analysis, METHODS_ASTRONOMY, METHODS_SELFASSEMBLY
 
-.. include:: ../WEBHOME.md
+def run(config_file: str, working_dir: str) -> None:
+    r"""
+    Main run function that parses the configuration file, ensures it exists in the provided (working) directory, and sets up output directory for post-analysis.
+    
+    Parameters
+    ----------
+    * config_file : str
+        * The name of the configuration file in working_dir
+    * working_dir : str
+        * The absolute path (working directory) where the entry point was invoked from
 
-"""
+    """
+    config = configparser.ConfigParser()
+
+    config_file = os.path.join(working_dir, config_file)
+
+    if not os.path.exists(config_file):
+        raise RuntimeError(f"Configuration file {config_file} does not exist. Check filename spelling and ensure it is located in {working_dir}.")
+
+    config.read(config_file)
+
+    all_methods = METHODS_ASTRONOMY + METHODS_SELFASSEMBLY
+
+    if config.get('general', 'method') not in all_methods:
+        raise RuntimeError(f"The method '{config.get('general', 'method')}' provided in configuration file '{config_file}' is not recognized by shapelets. Available options are: {', '.join(m for m in all_methods)}.")
+    
+    image_dir = os.path.join(working_dir, 'images')
+    if not os.path.exists(image_dir): 
+        raise RuntimeError(f"Path '{image_dir}' does not exist.")
+    
+    output_dir = os.path.join(working_dir, 'output')
+    if not os.path.exists(output_dir): 
+        os.mkdir(output_dir)
+
+    do_analysis(config, working_dir, image_dir, output_dir)

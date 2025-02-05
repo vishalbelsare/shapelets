@@ -15,10 +15,8 @@
 # <https://www.gnu.org/licenses/>.                                                                                     #
 ########################################################################################################################
 
-# Website front page goes here
-
 r"""
 
-.. include:: ../WEBHOME.md
+.. include:: ../../CHANGELOG.md
 
 """

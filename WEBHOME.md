@@ -1,14 +1,4 @@
-<h1 align="center">
-<img src="https://raw.githubusercontent.com/uw-comphys/shapelets/main/shapelets.png" width="650">
-</h1><br>
-
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06058/status.svg)](https://doi.org/10.21105/joss.06058)
-
-[**Getting Started**](#getting-started)
-| [**Issues**](#issues)
-| [**Contribute**](#contribute)
-| [**Citation**](#citation)
-| [**Authors**](#authors)
 
 ## What is shapelets? 
 
@@ -28,11 +18,17 @@ The shapelets library provides reference code and documentation for the followin
 
 ## Getting Started
 
-If you have Python 3.10+ installed on your machine, you can install the shapelets library via pip: 
+1. If you have Python 3.10+ installed, you can install the shapelets library via pip:
+```
+pip install shapelets
+```
+2. If you do not have Python 3.10+ installed, consult the [installation guide](https://uw-comphys.github.io/shapelets/shapelets/docs/installation_guide.html).
+3. Consult the [examples](https://uw-comphys.github.io/shapelets/shapelets/docs.html) to see how the library can be used.
+4. Checkout other documentation:
+    * [Custom Commands](https://uw-comphys.github.io/shapelets/shapelets/docs/custom_commands.html) 
+    * [Library Interface](https://uw-comphys.github.io/shapelets/shapelets/docs/library_interface.html)
 
-    pip install shapelets
-
-Otherwise, consult the [official website](https://uw-comphys.github.io/shapelets/shapelets.html) for installation instructions.
+If you plan to use the shapelets library for your own work, please cite appropriately using the [citation](#citation) below.
 
 ## Issues
 
@@ -44,13 +40,29 @@ The authors of the shapelets library welcome contributions to the source code. P
 
 * Open an issue on the library [issue tracker](https://github.com/uw-comphys/shapelets/issues) clearly describing your intentions on code modifications
 * Ensure your modifications or additions adhere to the existing standard of the shapelets library (i.e. how are your docstrings?) 
-* Test your modifications to ensure the integrity of the library is intact via the entry point: `shapelets-test`
-
+* Test your modifications to ensure the integrity of the library is intact via the entry point: 
+```
+shapelets-test
+```
 * Once the issue has been discussed with a library author, you may open a pull request containing your modifications
 
 ## Citation
 
-If you plan to use shapelets in your own work, please cite using the **Cite this repository** dropdown button on the top right of this page (under *About*).
+If you plan to use shapelets in your own work, please cite using the following bibtex citation:
+
+```
+@article{TinoShapelets2024,
+author = {Tino, Matthew Peres and Abdulaziz, Abbas Yusuf and Suderman, Robert and Akdeniz, Thomas and Abukhdeir, Nasser Mohieddin},
+title = {Shapelets: A Python package implementing shapelet functions and their applications},
+doi = {10.21105/joss.06058},
+journal = {Journal of Open Source Software},
+number = {95},
+pages = {6058},
+volume = {9},
+year = {2024},
+url = {https://joss.theoj.org/papers/10.21105/joss.06058}
+}
+```
 
 ## Authors
 

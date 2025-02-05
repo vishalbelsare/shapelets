@@ -15,6 +15,10 @@
 # <https://www.gnu.org/licenses/>.                                                                                     #
 ########################################################################################################################
 
+r"""
+This module holds miscellaneous functions that are critical for the self-assembly submodule, such as processing of image inputs and analysis outputs.
+"""
+
 import os 
 
 import cv2 
@@ -26,47 +30,13 @@ from scipy.ndimage import median_filter
 from .wavelength import get_wavelength
 
 __all__ = [
-    'make_grid',
     'read_image',
     'process_output',
     'image_difference',
     'trim_image'
 ]
 
-def make_grid(N: int):
-    r""" 
-    Make discretized grid based on width (N).
-    
-    Parameters
-    ----------
-    * N: int
-        * The width of the kernel (odd numbers only)
-
-    Returns
-    -------
-    * grid_x: np.ndarray
-        * The grid's x coordinate space
-    * grid_y: np.ndarray
-        * The grid's y coordinate space
-    
-    Notes
-    -----
-    As per convention, N should only be an odd number. Additionally, note that grid_x = grid_y.
-
-    """
-    if N % 2 == 0:
-        print('Detected even grid size, adding 1 to enforce odd rule See self_assembly.misc.make_grid() docs.')
-        N += 1
-    if N < 3:
-        raise ValueError('N must be at least 3 or greater.')
-    
-    bounds = [-(N-1)/2.0, (N-1)/2.0]
-    grid = np.linspace(bounds[0], bounds[1], N)
-    grid_x, grid_y = np.meshgrid(grid, grid)
-
-    return grid_x, grid_y
-
-def read_image(image_name: str, image_path: str, verbose: bool = True):
+def read_image(image_name: str, image_path: str, do_rescale: bool = True, verbose: bool = True) -> np.ndarray:
     r""" 
     Read an image using OpenCV, with some extra handling. By default, re-scales images as greyscale on [-1, 1].
     
@@ -76,6 +46,8 @@ def read_image(image_name: str, image_path: str, verbose: bool = True):
         * The filename of the image (including extension)
     * image_path: str
         * The path holding the image
+    * do_rescale : bool, optional
+        * Automatically re-scale in accordance with requirements for wavelength algorithm. Default is True
     * verbose: bool, optional
         * True (default) to print image-related information
     
@@ -89,33 +61,34 @@ def read_image(image_name: str, image_path: str, verbose: bool = True):
     Re-scaling of image to greyscale on [-1, 1] is intentional to align with the minimum and maximum of shapelet function values.
     
     """
-    # Ensure image_path provided exists
     if not os.path.exists(image_path):
         raise RuntimeError(f'Image path: {image_path} does not exist.')
     
-    # read image then ensure image does exist (by evaluating result of cv2.imread)
     f = cv2.imread(os.path.join(image_path, image_name))
     if not isinstance(f, np.ndarray):
         raise RuntimeError(f"Could not read image: {image_name}. Ensure it is located in {image_path} and is of image format.")
 
-    # convert to grayscale
     f = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY)
 
-    # check if re-scaling is needed b/c k-means clustering cannot handle very large images
-    init_shape = f.shape
-    resized = False 
-    while any(dim >= 1000 for dim in f.shape):
-        dim0, dim1 = round(f.shape[0]*0.8), round(f.shape[1]*0.8)
-        f = cv2.resize(f, dsize=(dim0, dim1))
-        resized = True
+    # NOTE: image may require rescaling based on two observed issues:
+    #   1. scipy.cluster.vq.kmeans yields abort: coredump if one dim of image large (~2000 pixels)
+    #   2. wavelength algorithm fails if image is too small... need to upsample
 
-    # rescale to [-1, 1] greyscale 
+    if do_rescale:
+        while any(dim >= 2000 for dim in f.shape):
+            height, width = round(f.shape[0]*0.8), round(f.shape[1]*0.8)
+            f = cv2.resize(f, dsize=(width, height)) # dsize is opposite numpy convention
+
+        while any(dim <= 500 for dim in f.shape):
+            height, width = round(f.shape[0]*1.2), round(f.shape[1]*1.2)
+            f = cv2.resize(f, dsize=(width, height)) # dsize is opposite numpy convention
+
+    # rescale to [-1, 1] greyscale to match shapelet kernel min/max values
     f = ( ((f-f.min()) / (f.max()-f.min())) * 2 ) - 1
 
     if verbose: 
         print(f"Successfully loaded image: {image_name}")
-        if resized: print(f"New image dimensions are: {f.shape} as initial size {init_shape} too large")
-        else: print(f"Image dimensions are: {f.shape}")
+        print(f"Image loaded with dimensions: {f.shape}")
         print(f"Image {image_name} normalized to greyscale on [-1, 1] to align with shapelet kernels")
 
     return f
@@ -127,7 +100,7 @@ def process_output(image: np.ndarray, image_name: str, save_path: str, output_fr
     * shapelets.self_assembly.quant.orientation
     * shapelets.self_assembly.quant.defectid
     
-    It was used to generate Figures 6, 7, 8, and 9 from ref.[1]_.
+    It was used to generate Figures 6, 7, 8, and 9 from ref. [1].
 
     NOTE: any image saved from the **kwargs argument is trimmed using shapelets.self_assembly.misc.trim_image. This is because the convolution with shapelet kernels is padded on the edges, producing a fuzzy convolutional response. The shapelets.self_assembly.misc.trim_image function removes this fuzzy response.
 
@@ -151,7 +124,7 @@ def process_output(image: np.ndarray, image_name: str, save_path: str, output_fr
 
     References
     ----------
-    .. [1] http://dx.doi.org/10.1088/1361-6528/ad1df4
+    * [1] http://dx.doi.org/10.1088/1361-6528/ad1df4
 
     """
     # check that save_path exists
@@ -319,9 +292,9 @@ def process_output(image: np.ndarray, image_name: str, save_path: str, output_fr
     else: 
         raise ValueError(f"output_from parameter as {output_from} not recognized by process_output().")
 
-def image_difference(im1: np.ndarray, im2: np.ndarray):
+def image_difference(im1: np.ndarray, im2: np.ndarray) -> np.ndarray:
     r""" 
-    This function computes the normalized difference between two images. It was used to generate Figure 5 from ref.[1]_.
+    This function computes the normalized difference between two images. It was used to generate Figure 5 from ref.[MT_image_difference]_.
 
     Parameters
     ----------
@@ -341,7 +314,7 @@ def image_difference(im1: np.ndarray, im2: np.ndarray):
     
     References
     ----------
-    .. [1] http://dx.doi.org/10.1088/1361-6528/ad1df4
+    .. [MT_image_difference] http://dx.doi.org/10.1088/1361-6528/ad1df4
 
     """
     if im1.shape != im2.shape:
@@ -356,16 +329,16 @@ def image_difference(im1: np.ndarray, im2: np.ndarray):
     
     return diff
 
-def trim_image(im: np.ndarray, l: float):
+def trim_image(im: np.ndarray, l: float) -> np.ndarray:
     r""" 
-    Trim image edges based on characteristic wavelength (l). Useful for images post convolution, as edges can present distortions because of padded convolution.
+    Trim image edges based on characteristic wavelength (l) [1]. Useful for images post convolution, as edges can present distortions because of padded convolution.
 
     Parameters
     ----------
     * im: np.ndarray
         * The image to trim
     * l: float
-        * The characteristic wavelength of the image[1]_
+        * The characteristic wavelength of the image
     
     Returns
     -------
@@ -373,11 +346,11 @@ def trim_image(im: np.ndarray, l: float):
 
     Notes
     -----
-    The characteristic wavelength[1]_ is roughly the distance between feature centers, thus making it an appropriate size for image trim or truncation after convolution.
+    The characteristic wavelength [1] is roughly the distance between feature centers, thus making it an appropriate size for image trim or truncation after convolution.
 
     References
     ----------
-    .. [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
+    * [1] http://dx.doi.org/10.1103/PhysRevE.91.033307
 
     """
     trim = round(l/2)
